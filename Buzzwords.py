@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import random
-import argparse #lässt Befehle aus einem Terminal ausführen
-
+import sys
 from pynput import keyboard
 from pynput.keyboard import Key
 
@@ -10,7 +9,7 @@ def on_key_release(key):
     if key == Key.right:
         print("Rechte Taste gedrückt")
 
-#import textual
+#Spielername
 spielerName = input("Wie heißt du? ")
 print("Willkommen", spielerName, "zu BUZZWORD")
 
@@ -58,14 +57,22 @@ def read_buzzword(roundfile):
         lines = f.readlines()
         return lines
 buzzwords = read_buzzword(roundfile)
-    
+
+def start_new_round():
+    # Hier kannst du die Logik für den Start einer neuen Runde implementieren
+    print("Eine neue Runde wird gestartet...")
 
 def main():
-    rows = int(input("Anzahl der Zeilen:"))
-    columns = int(input("Anzahl der Spalten:"))
-    generate_grid(rows, columns, buzzwords)
-    pruefeObWortRichtig()
+     if len(sys.argv) > 1 and sys.argv[1] == '-newround':
+        start_new_round()
+        rows = int(input("Anzahl der Zeilen:"))
+        columns = int(input("Anzahl der Spalten:"))
+        generate_grid(rows, columns, buzzwords)
+        pruefeObWortRichtig()
+     else:
+        print("Ungültiger Befehl. Verwenden Sie -newround, um eine neue Runde zu starten.")
+    
 
-if __name__ == "__main__":
-    main()
+     if __name__ == "__main__":
+        main()
 
