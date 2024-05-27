@@ -1,0 +1,9 @@
+2024-05-26 20:49:07,974 - INFO - Log-Datei für XYZ erstellt.
+2024-05-26 20:49:09,276 - INFO - 2024-05-26 20:49:09 - Button geklickt: Follower
+2024-05-26 20:49:09,773 - INFO - 2024-05-26 20:49:09 - Button geklickt: Skalierbar
+2024-05-26 20:49:10,733 - INFO - 2024-05-26 20:49:10 - Button geklickt: Benefits
+2024-05-26 20:49:11,388 - INFO - 2024-05-26 20:49:11 - Button geklickt: Wissenstransfer
+2024-05-26 20:49:12,647 - INFO - 2024-05-26 20:49:12 - Button rückgängig: Wissenstransfer
+2024-05-26 20:49:13,466 - INFO - 2024-05-26 20:49:13 - Button rückgängig: Skalierbar
+2024-05-26 20:49:15,092 - INFO - 2024-05-26 20:49:15 - Button geklickt: Impact
+2024-05-26 20:49:16,453 - INFO - 2024-05-26 20:49:16 - Spiel durch den Beenden Button beendet

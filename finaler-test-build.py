@@ -1,13 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 import random
-import sys
 from pynput import keyboard
 from pynput.keyboard import Key
 
-def on_key_release(key):
-    if key == Key.right:
-        print("Rechte Taste gedrückt")
+#def on_key_release(key):
+#    if key == Key.right:
+#        print("Rechte Taste gedrückt")
+
+#Rundenstart
+print("Die Runde wird gestartet")
 
 #Spielername
 spielerName = input("Wie heißt du? ")
@@ -17,20 +19,6 @@ print("Willkommen", spielerName, "zu BUZZWORD")
 print("Nenne den Namen der Datei:") #C:\Users\covrk\Documents\GitHub\BSRN-Gruppenaufgabe\Buzzwords-Datei.txt
 roundfile = input()
 roudnfileOpener = open(roundfile, 'r') #Variabeln umbenennen!
-
-
-def pruefeObWortRichtig():
-    #Start des Spiels
-    print("Willkommen zum Buzzword-Bingo")
-    print("Nenne ein Wort:")
-    wort = input()
-    #Überprüfung ob das Wort in der Datei ist
-    if wort in random.choice(buzzwords):
-        print("Dein Wort befindet sich in der Datei")
-        roudnfileOpener.close()
-    else:
-        print("Dieses Buzzword ist leider nicht dabei")
-
 
 
 #TEST EINER GRID mit Tkinter:   
@@ -58,21 +46,12 @@ def read_buzzword(roundfile):
         return lines
 buzzwords = read_buzzword(roundfile)
 
-def start_new_round():
-    # Hier kannst du die Logik für den Start einer neuen Runde implementieren
-    print("Eine neue Runde wird gestartet...")
-
 def main():
-     if len(sys.argv) > 1 and sys.argv[1] == '-newround':
-        start_new_round()
-        rows = int(input("Anzahl der Zeilen:"))
-        columns = int(input("Anzahl der Spalten:"))
-        generate_grid(rows, columns, buzzwords)
-        pruefeObWortRichtig()
-     else:
-        print("Ungültiger Befehl. Verwenden Sie -newround, um eine neue Runde zu starten.")
-    
+    rows = int(input("Anzahl der Zeilen:"))
+    columns = int(input("Anzahl der Spalten:"))
+    generate_grid(rows, columns, buzzwords)
 
-     if __name__ == "__main__":
+
+if __name__ == "__main__":
         main()
 
