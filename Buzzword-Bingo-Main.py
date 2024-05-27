@@ -31,6 +31,9 @@ def create_log_file(player_name, log_directory):
     logging.basicConfig(filename=log_file_name, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     # Erste Info in der Log-Datei
     logging.info(f"Log-Datei für {player_name} erstellt.")
+    
+    #Log-Datei Größe des Spielfelds (X-Achse/Y-Achse)
+    logging.info(f" Zeilen: {zeilen} , Spalten: {spalten} ")
 
 # Methode zum Lesen der Buzzwords aus der angegebenen Datei
 def read_buzzword(roundfile):
@@ -78,15 +81,21 @@ def log_buzzword(button):
 # Setze die Buzzwords in die Knöpfe ein 
 for i in range(zeilen):
     for j in range(spalten):
-        buzzword = random.choice(buzzwords).strip()
-        while buzzword in used_buzzwords:
+         # Bei Ungradenzahlen bleibt das Mittel Feld frei (Joker)  
+        if zeilen % 2 != 0 and spalten % 2 != 0 and i == zeilen // 2 and j == spalten // 2:
+            btn = CustomTTkButton(border=True, text="Joker", font=("Times New Roman", 24), checkable=True)
+            btn.setBgColor(color='#ff88ff')
+            winLayout.addWidget(btn, i, j)  # Joker-Button hinzufügen
+        else:
             buzzword = random.choice(buzzwords).strip()
-        used_buzzwords.add(buzzword)
-        btn = CustomTTkButton(border=True, text=buzzword, font=("Times New Roman", 24), checkable=True)
-        btn.clicked.connect(lambda b=btn: log_buzzword(b))
-        winLayout.addWidget(btn, i, j)
+            while buzzword in used_buzzwords:
+                buzzword = random.choice(buzzwords).strip()
+            used_buzzwords.add(buzzword)
+            btn = CustomTTkButton(border=True, text=buzzword, font=("Times New Roman", 24), checkable=True)
+            btn.clicked.connect(lambda b=btn: log_buzzword(b))
+            winLayout.addWidget(btn, i, j)
 
 close_button = CustomTTkButton(border=True, text="Spiel beenden", font=("Times New Roman", 24), checkable=True)
 close_button.clicked.connect(spiel_beenden)  # Verbindet den Schließen-Button mit der Funktion zum Beenden des Spiels
-winLayout.addWidget(close_button, zeilen+1, spalten+1)
+winLayout.addWidget(close_button, zeilen, spalten-1)  # Korrigierte Position für den Schließen-Button
 root.mainloop()
