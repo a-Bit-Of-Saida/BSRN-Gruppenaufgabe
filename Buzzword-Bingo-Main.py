@@ -130,7 +130,7 @@ for i in range(zeilen):
     for j in range(spalten):
         # Bei Ungradenzahlen bleibt das Mittel Feld frei (Joker)  
         if zeilen % 2 != 0 and spalten % 2 != 0 and i == zeilen // 2 and j == spalten // 2:
-            btn = CustomTTkButton(border=True, text="Joker", font=("Times New Roman", 24), checkable=True)
+            btn = CustomTTkButton(border=True, text="Joker", font=("Times New Roman", 24), checkable=True, checked=True)
             btn.setBgColor(color='#ff88ff')
             winLayout.addWidget(btn, i, j)  # Joker-Button hinzufügen
             buttons[i][j] = btn
