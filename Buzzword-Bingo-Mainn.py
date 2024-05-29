@@ -34,7 +34,7 @@ def create_log_file(player_name, log_directory):
     logging.info(f"Log-Datei für {player_name} erstellt.")
     
     #Log-Datei Größe des Spielfelds (X-Achse/Y-Achse)
-    logging.info(f" Zeilen: {zeilen} , Spalten: {spalten} ")
+    logging.info(f" Größe des Spielfelds Zeilen: {zeilen} , Spalten: {spalten} ")
 
 # Methode zum Lesen der Buzzwords aus der angegebenen Datei
 def read_buzzword(roundfile):
@@ -65,7 +65,8 @@ buttons = [[None for _ in range(spalten)] for _ in range(zeilen)]
 # Funktion zum Beenden des Spiels
 def spiel_beenden():
     now = datetime.now() # Variable now nimmt den Wert der derzeitigen Zeit an
-    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Spiel durch den Beenden Button beendet") #in der Log_Datei als Beenden durch Button eingetragen
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Abbruch des Spiel") # in der Log-Datei wird vermerkt, dass das Spiel abbgebrchen wurde 
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Ende des Spiels") # zusätzlicher Eintrag für das Ende des Spiels
     sys.exit(0) #Beendet das Programm 
 
 # Funktion zur Überprüfung des Gewinns
@@ -83,14 +84,14 @@ def check_win():
     return False
 
 # Log-Datei Eintrag bei Anklicken eines Buttons
-def log_buzzword(button):
+def log_buzzword(button, row, col):
     now = datetime.now() # Variable now nimmt den Wert der derzeitigen Zeit an
     button_text = button.text() 
     if button.isChecked(): # Wenn der Button angeklickt wurde, dann gib in der Log-Datei dies aus und davor noch die Zeit
-        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button geklickt: {button_text}")
+        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button geklickt: {button_text}  (Zeile: {row+1}, Spalte: {col+1})")
         button.setBgColor('#88ffff')
     else:
-        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button rückgängig: {button_text}") # einmal das aus Zeile 62/63 rückgängig mit der gleichen Syntax
+        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button rückgängig: {button_text} ( Zeile: {row+1}, Spalte: {col+1})") # einmal das aus Zeile 62/63 rückgängig mit der gleichen Syntax
         button.setBgColor(None) 
     if check_win():
         gewonnen()
@@ -123,7 +124,10 @@ def gewonnen():
     except KeyboardInterrupt:
         pass
 
-    spiel_beenden()
+    now = datetime.now()
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Sieg") # in der Log-Datei wird vermerkt, dass das Spiel gewonnen wurde
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Ende des Spiels") # zusätzlicher Eintrag für das Ende des Spiels
+    return      # Sobald das Spiel gewonnen wurde, wird die Funktion beendet und es werden keine weiteren Einträge gemacht
 
 # Setze die Buzzwords in die Knöpfe ein 
 for i in range(zeilen):
@@ -140,7 +144,7 @@ for i in range(zeilen):
                 buzzword = random.choice(buzzwords).strip()
             used_buzzwords.add(buzzword)
             btn = CustomTTkButton(border=True, text=buzzword, font=("Times New Roman", 24), checkable=True)
-            btn.clicked.connect(lambda b=btn: log_buzzword(b))
+            btn.clicked.connect(lambda b=btn, row=i, col=j: log_buzzword(b, row, col))
             winLayout.addWidget(btn, i, j)
             buttons[i][j] = btn
 
