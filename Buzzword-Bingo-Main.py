@@ -1,17 +1,13 @@
 import os
 import sys
-import random
-import time
-from datetime import datetime
+import random 
+import time 
+from datetime import datetime 
 import logging
-import TermTk as ttk  # Importiert pyTermTk zum Visualisieren
-from TermTk.TTkCore.cfg import TTkCfg
-from TermTk.TTkCore.constant import TTkK
+import TermTk as ttk  
 from TermTk.TTkCore.color import TTkColor  
-from TermTk.TTkLayouts import TTkGridLayout, TTkLayout
-from TermTk.TTkWidgets import TTkWidget
-from TermTk.TTkWidgets.button import TTkButton
-from TermTk.TTkWidgets.resizableframe import TTkResizableFrame
+from TermTk.TTkWidgets.button import TTkButton 
+
 
 def create_log_file(player_name: str, log_directory: str, zeilen: int, spalten: int):
     os.makedirs(log_directory, exist_ok=True)
@@ -42,12 +38,11 @@ def log_buzzword(button, zeilen, spalten):
     button_text = button.text()
     if button.isChecked():
         logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button geklickt: {button_text}")
-        button.setBgColor('#88ffff')
     else:
         logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button rückgängig: {button_text}")
         button.setBgColor(None)
     if check_win(zeilen, spalten):
-        gewonnen()
+        gewonnen_animation()
 
 def check_win(zeilen, spalten):
     for i in range(zeilen):
@@ -62,7 +57,7 @@ def check_win(zeilen, spalten):
         return True
     return False
 
-def gewonnen():
+def gewonnen_animation():
     text = "SIE HABEN GEWONNEN"
     iterations = 3
     delay = 0.05
@@ -107,7 +102,6 @@ def main(spielername: str, roundfile: str, log_path: str, zeilen: int, spalten: 
         for j in range(spalten):
             if zeilen % 2 != 0 and spalten % 2 != 0 and i == zeilen // 2 and j == spalten // 2:
                 btn = CustomTTkButton(border=True, text="Joker", font=("Times New Roman", 24), checkable=True, checked=True)
-                btn.setBgColor(color='#ff88ff')
                 winLayout.addWidget(btn, i, j)
                 buttons[i][j] = btn
             else:
