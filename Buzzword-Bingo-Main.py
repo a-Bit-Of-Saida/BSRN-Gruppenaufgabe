@@ -16,7 +16,7 @@ def create_log_file(player_name: str, log_directory: str, zeilen: int, spalten: 
     log_file_name = os.path.join(log_directory, f"log-{date_string}-{player_name}.txt")
     logging.basicConfig(filename=log_file_name, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info(f"Log-Datei für {player_name} erstellt.")
-    logging.info(f"Zeilen: {zeilen}, Spalten: {spalten}")
+    logging.info(f" Größe  des Spierlfelds Zeilen: {zeilen}, Spalten: {spalten}")
 
 def read_buzzword(roundfile: str):
     with open(roundfile, 'r', encoding='utf-8') as f:
@@ -30,16 +30,17 @@ class CustomTTkButton(TTkButton):
 
 def spiel_beenden():
     now = datetime.now()
-    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Spiel durch den Beenden Button beendet")
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Abbruch des Spiel")  
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Ende des Spiels")
     sys.exit(0)
 
-def log_buzzword(button, zeilen, spalten, spieler_name):
+def log_buzzword(button, row, col, zeilen, spalten, spieler_name):
     now = datetime.now()
     button_text = button.text()
     if button.isChecked():
-        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button geklickt: {button_text}")
+        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button geklickt: {button_text} (Zeile: {row+1}, Spalte: {col+1})")
     else:
-        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button rückgängig: {button_text}")
+        logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button rückgängig: {button_text} ( Zeile: {row+1}, Spalte: {col+1})")
         button.setBgColor(None)
     if check_win(zeilen, spalten):
         gewonnen_animation(spieler_name)
@@ -83,8 +84,10 @@ def gewonnen_animation(spieler_name):
 
     except KeyboardInterrupt:
         pass
+    now = datetime.now()
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Sieg") 
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Ende des Spiels") 
 
-    spiel_beenden()
 
 
 def main(spielername: str, roundfile: str, log_path: str, zeilen: int, spalten: int):
@@ -110,13 +113,13 @@ def main(spielername: str, roundfile: str, log_path: str, zeilen: int, spalten: 
                     buzzword = random.choice(buzzwords).strip()
                 used_buzzwords.add(buzzword)
                 btn = CustomTTkButton(border=True, text=buzzword, font=("Times New Roman", 24), checkable=True)
-                btn.clicked.connect(lambda b=btn: log_buzzword(b, zeilen, spalten, spielername))
+                btn.clicked.connect(lambda b=btn, row=i, col=j: log_buzzword(b, row, col, zeilen, spalten, spielername,))
                 winLayout.addWidget(btn, i, j)
                 buttons[i][j] = btn
 
     close_button = CustomTTkButton(border=True, text="Spiel beenden", font=("Times New Roman", 24), checkable=True)
     close_button.clicked.connect(spiel_beenden)
-    winLayout.addWidget(close_button, zeilen, spalten - 1)
+    winLayout.addWidget(close_button, zeilen, spalten- 1)
     root.mainloop()
 
 if __name__ == "__main__":
