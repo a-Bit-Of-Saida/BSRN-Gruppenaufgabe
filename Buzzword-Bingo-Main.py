@@ -8,7 +8,6 @@ import TermTk as ttk
 from TermTk.TTkCore.color import TTkColor  
 from TermTk.TTkWidgets.button import TTkButton 
 
-
 def create_log_file(player_name: str, log_directory: str, zeilen: int, spalten: int):
     os.makedirs(log_directory, exist_ok=True)
     now = datetime.now()
@@ -85,8 +84,9 @@ def gewonnen_animation(spieler_name):
     except KeyboardInterrupt:
         pass
     now = datetime.now()
-    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Sieg") 
+    logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} {spieler_name}- hat gewonnen!") 
     logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Ende des Spiels") 
+    sys.exit(0)
 
 
 
