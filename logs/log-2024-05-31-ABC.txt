@@ -1,0 +1,11 @@
+2024-05-31 16:09:35,686 - INFO - Log-Datei für ABC erstellt.
+2024-05-31 16:09:35,686 - INFO -  Größe  des Spierlfelds Zeilen: 3, Spalten: 3
+2024-05-31 16:09:36,968 - INFO - 2024-05-31 16:09:36 - Button geklickt: Big Picture (Zeile: 1, Spalte: 1)
+2024-05-31 16:09:38,156 - INFO - 2024-05-31 16:09:38 - Button geklickt: Positionierung/Positionieren (Zeile: 1, Spalte: 2)
+2024-05-31 16:09:40,376 - INFO - 2024-05-31 16:09:40 - Button geklickt: Pro-aktiv (Zeile: 2, Spalte: 3)
+2024-05-31 16:09:42,237 - INFO - 2024-05-31 16:09:42 - Button rückgängig: Big Picture ( Zeile: 1, Spalte: 1)
+2024-05-31 16:09:45,107 - INFO - 2024-05-31 16:09:45 - Button geklickt: Open Innovation (Zeile: 3, Spalte: 1)
+2024-05-31 16:09:45,974 - INFO - 2024-05-31 16:09:45 - Button rückgängig: Positionierung/Positionieren ( Zeile: 1, Spalte: 2)
+2024-05-31 16:09:47,879 - INFO - 2024-05-31 16:09:47 - Button geklickt: Rund sein (Zeile: 1, Spalte: 3)
+2024-05-31 16:10:01,565 - INFO - 2024-05-31 16:10:01 ABC- hat gewonnen!
+2024-05-31 16:10:01,565 - INFO - 2024-05-31 16:10:01 - Ende des Spiels
