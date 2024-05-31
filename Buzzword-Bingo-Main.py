@@ -33,7 +33,7 @@ def spiel_beenden():
     logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Spiel durch den Beenden Button beendet")
     sys.exit(0)
 
-def log_buzzword(button, zeilen, spalten):
+def log_buzzword(button, zeilen, spalten, spieler_name):
     now = datetime.now()
     button_text = button.text()
     if button.isChecked():
@@ -42,7 +42,7 @@ def log_buzzword(button, zeilen, spalten):
         logging.info(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - Button rückgängig: {button_text}")
         button.setBgColor(None)
     if check_win(zeilen, spalten):
-        gewonnen_animation()
+        gewonnen_animation(spieler_name)
 
 def check_win(zeilen, spalten):
     for i in range(zeilen):
@@ -57,8 +57,8 @@ def check_win(zeilen, spalten):
         return True
     return False
 
-def gewonnen_animation():
-    text = "SIE HABEN GEWONNEN"
+def gewonnen_animation(spieler_name):
+    text = f"{spieler_name} HAT GEWONNEN"
     iterations = 3
     delay = 0.05
 
@@ -110,7 +110,7 @@ def main(spielername: str, roundfile: str, log_path: str, zeilen: int, spalten: 
                     buzzword = random.choice(buzzwords).strip()
                 used_buzzwords.add(buzzword)
                 btn = CustomTTkButton(border=True, text=buzzword, font=("Times New Roman", 24), checkable=True)
-                btn.clicked.connect(lambda b=btn: log_buzzword(b, zeilen, spalten))
+                btn.clicked.connect(lambda b=btn: log_buzzword(b, zeilen, spalten, spielername))
                 winLayout.addWidget(btn, i, j)
                 buttons[i][j] = btn
 
