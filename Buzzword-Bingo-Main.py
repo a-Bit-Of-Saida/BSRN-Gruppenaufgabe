@@ -91,6 +91,9 @@ def gewonnen_animation(spieler_name):
 
 
 def main(spielername: str, roundfile: str, log_path: str, zeilen: int, spalten: int):
+    if (spielername != str):
+        print("Bitte gib einen gültigen Namen ohne Zahlen und Sonderzeichen ein")
+        sys.exit(0)
     buzzwords = read_buzzword(roundfile)
     create_log_file(spielername, log_path, zeilen, spalten)
     root = ttk.TTk()
