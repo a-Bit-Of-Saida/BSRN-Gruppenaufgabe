@@ -1,0 +1,9 @@
+2024-06-30 00:02:19,921 - INFO - Log-Datei für Mariam erstellt.
+2024-06-30 00:02:19,921 - INFO - Größe des Spielfelds: Zeilen: 3, Spalten: 3
+2024-06-30 00:02:19,921 - INFO - Start des Spiels.
+2024-06-30 00:02:20,596 - INFO - Button geklickt: Fokussieren (Zeile: 1, Spalte: 1)
+2024-06-30 00:02:25,504 - INFO - Button geklickt: Skills (Zeile: 2, Spalte: 1)
+2024-06-30 00:02:26,604 - INFO - Button rückgängig: Fokussieren (Zeile: 1, Spalte: 1)
+2024-06-30 00:02:27,919 - INFO - Button geklickt: Global Player (Zeile: 2, Spalte: 3)
+2024-06-30 00:02:29,486 - INFO - Ende des Spiels
+2024-06-30 00:02:29,486 - INFO - Mariam hat gewonnen!

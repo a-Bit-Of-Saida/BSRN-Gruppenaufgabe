@@ -1,0 +1,7 @@
+2024-06-30 00:02:12,833 - INFO - Log-Datei für Saida erstellt.
+2024-06-30 00:02:12,833 - INFO - Größe des Spielfelds: Zeilen: 3, Spalten: 3
+2024-06-30 00:02:12,833 - INFO - Start des Spiels.
+2024-06-30 00:02:22,025 - INFO - Button geklickt: Benefits (Zeile: 1, Spalte: 1)
+2024-06-30 00:02:23,294 - INFO - Button geklickt: Szenario (Zeile: 2, Spalte: 3)
+2024-06-30 00:02:29,487 - INFO - Mariam hat gewonnen!
+2024-06-30 00:02:47,402 - INFO - Ende des Spiels
