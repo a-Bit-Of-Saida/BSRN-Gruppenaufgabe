@@ -1,9 +1,0 @@
-2024-05-31 11:25:59,679 - INFO - Log-Datei für XYZ erstellt.
-2024-05-31 11:25:59,679 - INFO - Zeilen: 3, Spalten: 3
-2024-05-31 11:26:00,992 - INFO - 2024-05-31 11:26:00 - Button geklickt: Gadget
-2024-05-31 11:26:01,377 - INFO - 2024-05-31 11:26:01 - Button geklickt: Fokussieren
-2024-05-31 11:26:02,480 - INFO - 2024-05-31 11:26:02 - Button geklickt: Pro-aktiv
-2024-05-31 11:26:03,703 - INFO - 2024-05-31 11:26:03 - Button rückgängig: Fokussieren
-2024-05-31 11:26:05,535 - INFO - 2024-05-31 11:26:05 - Button rückgängig: Gadget
-2024-05-31 11:26:07,615 - INFO - 2024-05-31 11:26:07 - Button geklickt: Zielführend
-2024-05-31 11:26:20,638 - INFO - 2024-05-31 11:26:20 - Spiel durch den Beenden Button beendet
