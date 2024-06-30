@@ -87,7 +87,7 @@ def log_buzzword(button, row, col, app):
 
 def spiel_beenden():
     logging.info("Ende des Spiels")
-    sys.ecit(0)
+    sys.exit(0)
 
 def run_game(stdscr, player_name, zeilen, spalten, roundfile, log_path, game_state=None):
     if curses.LINES < 20 or curses.COLS < 80:
@@ -292,6 +292,7 @@ class ButtonGridApp:
         # Umkehrung des pressed-Status
         button.set_pressed(not button.pressed)
         row, col = divmod(index, self.columns)
+        log_buzzword(button, row, col, self)
     
     def resize(self):
         curses.endwin()
@@ -373,6 +374,7 @@ class ButtonGridApp:
         button = self.buttons[index]
         button.toggle_pressed()
         row, col = divmod(index, self.columns)
+        log_buzzword(button, row, col, self)
 
     def draw_buttons(self):
         self.stdscr.clear()  # Clear the entire screen
