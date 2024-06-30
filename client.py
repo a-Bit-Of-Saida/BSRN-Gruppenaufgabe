@@ -6,6 +6,8 @@ import os
 import logging
 import datetime
 import posix_ipc  # type: ignore
+import signal
+import threading
 
 clients = []
 QUEUE_SERVER = "/serverQueue"
@@ -485,24 +487,24 @@ class ButtonGridApp:
         curses.endwin()
         spiel_beenden()  # This is your method to cleanly exit the game
 
-    def cleanup():
-        for client_queue_name in clients:
-            try:
-                client_queue = posix_ipc.MessageQueue(client_queue_name)
-                client_queue.close()
-                client_queue.unlink()
-            except posix_ipc.ExistentialError:
-                pass  # Ignore if queue does not exist
-
+def cleanup():
+    for client_queue_name in clients:
         try:
-            queue_server = posix_ipc.MessageQueue(QUEUE_SERVER)
-            queue_server.close()
-            queue_server.unlink()
+            client_queue = posix_ipc.MessageQueue(client_queue_name)
+            client_queue.close()
+            client_queue.unlink()
         except posix_ipc.ExistentialError:
             pass  # Ignore if queue does not exist
 
-        curses.endwin()  # Ensure the curses window is properly closed
-        sys.exit(0)  # Exit the program with success status
+    try:
+        queue_server = posix_ipc.MessageQueue(QUEUE_SERVER)
+        queue_server.close()
+        queue_server.unlink()
+    except posix_ipc.ExistentialError:
+        pass  # Ignore if queue does not exist
+
+    curses.endwin()  # Ensure the curses window is properly closed
+    sys.exit(0)  # Exit the program with success status
     
 if __name__ == "__main__":
     if len(sys.argv) != 2:
