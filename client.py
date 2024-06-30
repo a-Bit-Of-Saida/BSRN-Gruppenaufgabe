@@ -7,6 +7,8 @@ import logging
 import datetime
 import posix_ipc  # type: ignore
 
+clients = []
+QUEUE_SERVER = "/serverQueue"
 
 def intro_menu(stdscr):
     curses.curs_set(0)
@@ -85,6 +87,28 @@ def spiel_beenden():
     logging.info("Ende des Spiels")
     sys.ecit(0)
 
+def run_game(stdscr, player_name, zeilen, spalten, roundfile, log_path, game_state=None):
+    if curses.LINES < 20 or curses.COLS < 80:
+        raise Exception("Terminal window is too small. Please resize to at least 80x20.")
+
+    app = ButtonGridApp(stdscr, player_name, zeilen, spalten, roundfile)
+    if game_state:
+        app.restore_game_state(game_state)
+    create_log_file(player_name, log_path, zeilen, spalten)
+
+    # Start a thread to listen for win messages
+    listener_thread = threading.Thread(target=message_listener, args=(app, player_name))
+    listener_thread.daemon = True
+    listener_thread.start()
+
+    # Setup signal handler for window resize
+    signal.signal(signal.SIGWINCH, lambda signum, frame: handle_resize(signum, frame, app))
+
+    app.run(stdscr)
+
+def handle_resize(signum, frame, app):
+    app.handle_resize()
+
 class Button:
     def __init__(self, label, selected=False):
         self.label = label
@@ -97,6 +121,11 @@ class Button:
         
     def set_pressed(self, pressed):
         self.pressed = pressed
+
+def close_game():
+    print("Game closed, exiting in 5 seconds...")
+    time.sleep(3)
+    sys.exit(0)
 
 class ButtonGridApp:
     def __init__(self, stdscr, player_name, zeilen, spalten, roundfile):
@@ -349,6 +378,25 @@ class ButtonGridApp:
         # Ensure the screen is cleared and curses mode is exited before exiting
         curses.endwin()
         spiel_beenden()  # This is your method to cleanly exit the game
+
+    def cleanup():
+        for client_queue_name in clients:
+            try:
+                client_queue = posix_ipc.MessageQueue(client_queue_name)
+                client_queue.close()
+                client_queue.unlink()
+            except posix_ipc.ExistentialError:
+                pass  # Ignore if queue does not exist
+
+        try:
+            queue_server = posix_ipc.MessageQueue(QUEUE_SERVER)
+            queue_server.close()
+            queue_server.unlink()
+        except posix_ipc.ExistentialError:
+            pass  # Ignore if queue does not exist
+
+        curses.endwin()  # Ensure the curses window is properly closed
+        sys.exit(0)  # Exit the program with success status
     
     if __name__ == "__main__":
         if len(sys.argv) != 2:

@@ -4,6 +4,18 @@ import sys
 # Name der POSIX Message Queue für die Kommunikation mit Clients
 QUEUE_SERVER = "/serverQueue"
 
+def read_text_file(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            text = file.read()
+        return text
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+        return None
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
+    
 def wait_for_player_join(queue_server, roundfile, log_path, zeilen, spalten, max_players):
     player_count = 0
     clients = []
@@ -39,6 +51,16 @@ def wait_for_player_join(queue_server, roundfile, log_path, zeilen, spalten, max
             # Do not unlink here, unlink only when all clients have exited
         except posix_ipc.ExistentialError:
             pass
+    
+def send_game_params(client_queue_name, roundfile, log_path, zeilen, spalten, max_players):
+    try:
+        client_queue = posix_ipc.MessageQueue(client_queue_name)
+        parameters = f"{roundfile}|{log_path}|{zeilen}|{spalten}|{max_players}"
+        client_queue.send(parameters.encode())
+        client_queue.close()
+        print(f"Parameters sent to {client_queue_name}")
+    except posix_ipc.ExistentialError:
+        print(f"Failed to open client queue '{client_queue_name}'")
         
 def main(roundfile, log_path, zeilen, spalten, max_players):
     try:
@@ -52,7 +74,29 @@ def main(roundfile, log_path, zeilen, spalten, max_players):
     except posix_ipc.ExistentialError:
         print(f"Message queue '{QUEUE_SERVER}' does not exist.")
         sys.exit(1)
+
+def handle_win_message(win_message, clients):
+    # Broadcast win message to all connected clients
+    notify_all_clients(clients, win_message)
+    print(f"Spieler: {win_message}!")
+
+def notify_all_clients(clients, message):
+    for client_queue_name in clients:
+        try:
+            client_queue = posix_ipc.MessageQueue(client_queue_name)
+            client_queue.send(message.encode())
+            client_queue.close()
+            print(f"Message '{message}' sent to {client_queue_name}")
+        except posix_ipc.ExistentialError:
+            print(f"Failed to open client queue '{client_queue_name}'")
         
+def is_valid_int(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
 if __name__ == "__main__":
     if len(sys.argv) == 6:
         roundfile = sys.argv[1]
@@ -60,6 +104,23 @@ if __name__ == "__main__":
         zeilen = sys.argv[3]
         spalten = sys.argv[4]
         max_players = sys.argv[5]
+
+        # Validate zeilen, spalten, max_players inputs
+        if not is_valid_int(zeilen):
+            print("Bitte gib für 'zeilen' eine ganze Zahl ein.")
+            sys.exit(1)
+        if not is_valid_int(spalten):
+            print("Bitte gib für 'spalten' eine ganze Zahl ein.")
+            sys.exit(1)
+        if not is_valid_int(max_players):
+            print("Bitte gib für 'max_players' eine ganze Zahl ein.")
+            sys.exit(1)
+
+        # Convert zeilen, spalten, max_players to integers
+        zeilen = int(zeilen)
+        spalten = int(spalten)
+        max_players = int(max_players)
+
         main(roundfile, log_path, zeilen, spalten, max_players)
     else:
         print("Usage: server.py <roundfile_path> <log_path> <zeilen> <spalten> <max_players>")
