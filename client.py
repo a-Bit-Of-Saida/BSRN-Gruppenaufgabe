@@ -5,7 +5,7 @@ import time
 import os
 import logging
 import datetime
-
+import posix_ipc  # type: ignore
 
 
 def intro_menu(stdscr):
@@ -118,7 +118,31 @@ class ButtonGridApp:
         self.stdscr.refresh()
         self.stdscr.clear()
         self.draw_buttons()
-        
+    
+    def broadcast_win(self):
+            win_message = f"{self.player_name} hat gewonnen!"
+            logging.info("Ende des Spiels")
+            try:
+                queue_server = posix_ipc.MessageQueue(QUEUE_SERVER)
+                queue_server.send(win_message.encode())
+                queue_server.close()
+            except posix_ipc.ExistentialError:
+                print(f"Error: Could not open server queue '{QUEUE_SERVER}'")
+
+            # Send the win message to all clients
+            for client_queue_name in clients:
+                try:
+                    client_queue = posix_ipc.MessageQueue(client_queue_name)
+                    client_queue.send(win_message.encode())
+                    client_queue.close()
+                except posix_ipc.ExistentialError:
+                    print(f"Error: Could not open client queue '{client_queue_name}'")
+
+            time.sleep(3)
+            queue_server.unlink()
+            time.sleep(5)
+            close_game()
+
     def draw_player_name(self):
         player_label = f"Spieler: {self.player_name}"
         start_y = 0  # Zeile direkt über dem Buttonfeld
@@ -197,6 +221,14 @@ class ButtonGridApp:
                     self.update_selected_button(self.selected_button_index - 1)
                 elif key == curses.KEY_RIGHT and self.selected_button_index % self.columns < self.columns - 1:
                     self.update_selected_button(self.selected_button_index + 1)
+                elif key == 10:  # Enter key
+                    if self.selected_button_index == len(self.buttons) - 1:  # BINGO button
+                        if self.check_for_win():
+                            self.broadcast_win()
+                            self.gewonnen_animation(self.player_name)
+                            return
+                    else:
+                        self.toggle_button_pressed(self.selected_button_index)
 
                 self.draw_buttons()
 
@@ -257,12 +289,66 @@ class ButtonGridApp:
         
         self.stdscr.refresh()  # Refresh the screen to apply changes
 
+    def check_for_win_and_register(self):
+        if self.check_for_win():
+            self.broadcast_win()
             
     def update_selected_button(self, new_index):
         self.buttons[self.selected_button_index].selected = False
         self.selected_button_index = new_index
         self.buttons[self.selected_button_index].selected = True
 
+    def check_for_win(self):
+        # Check for horizontal wins
+        for r in range(self.rows):
+            row_buttons = self.buttons[r * self.columns:(r + 1) * self.columns]
+            if all(button.pressed for button in row_buttons):
+                self.bingo_reached = True
+                return True
+    
+        # Check for vertical wins
+        for c in range(self.columns):
+            col_buttons = [self.buttons[r * self.columns + c] for r in range(self.rows)]
+            if all(button.pressed for button in col_buttons):
+                self.bingo_reached = True
+                return True
+    
+        # Check for diagonal wins
+        diagonal_buttons = [self.buttons[i * self.columns + i] for i in range(self.rows)]
+        if all(button.pressed for button in diagonal_buttons):
+            self.bingo_reached = True
+            return True
+    
+        diagonal_buttons = [self.buttons[i * self.columns + self.columns - i - 1] for i in range(self.rows)]
+        if all(button.pressed for button in diagonal_buttons):
+            self.bingo_reached = True
+            return True
+    
+        return False
+        
+    def gewonnen_animation(self, spieler_name):
+        def clear_screen():
+            os.system('cls' if os.name == 'nt' else 'clear')
+        text = f"Congratulations, {spieler_name} won!"
+        stars = "*" * 20
+        win_message = f"\n{stars}\n{text}\n{stars}\n"
+
+        try:
+            for _ in range(2):
+                for i in range(len(win_message)):
+                    clear_screen()
+                    print(win_message[i:])
+                    time.sleep(0.1)
+
+            # Add a delay after the animation to allow the user to see it
+            time.sleep(3)  # Adjust the duration as needed
+
+        except KeyboardInterrupt:
+            pass
+
+        # Ensure the screen is cleared and curses mode is exited before exiting
+        curses.endwin()
+        spiel_beenden()  # This is your method to cleanly exit the game
     
     if __name__ == "__main__":
         if len(sys.argv) != 2:
