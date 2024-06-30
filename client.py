@@ -197,14 +197,6 @@ class ButtonGridApp:
                     self.update_selected_button(self.selected_button_index - 1)
                 elif key == curses.KEY_RIGHT and self.selected_button_index % self.columns < self.columns - 1:
                     self.update_selected_button(self.selected_button_index + 1)
-                elif key == 10:  # Enter key
-                    if self.selected_button_index == len(self.buttons) - 1:  # BINGO button
-                        if self.check_for_win():
-                            self.broadcast_win()
-                            self.gewonnen_animation(self.player_name)
-                            return
-                    else:
-                        self.toggle_button_pressed(self.selected_button_index)
 
                 self.draw_buttons()
 
@@ -265,42 +257,12 @@ class ButtonGridApp:
         
         self.stdscr.refresh()  # Refresh the screen to apply changes
 
-    def check_for_win_and_register(self):
-        if self.check_for_win():
-            self.broadcast_win()
             
     def update_selected_button(self, new_index):
         self.buttons[self.selected_button_index].selected = False
         self.selected_button_index = new_index
         self.buttons[self.selected_button_index].selected = True
 
-    def check_for_win(self):
-        # Check for horizontal wins
-        for r in range(self.rows):
-            row_buttons = self.buttons[r * self.columns:(r + 1) * self.columns]
-            if all(button.pressed for button in row_buttons):
-                self.bingo_reached = True
-                return True
-    
-        # Check for vertical wins
-        for c in range(self.columns):
-            col_buttons = [self.buttons[r * self.columns + c] for r in range(self.rows)]
-            if all(button.pressed for button in col_buttons):
-                self.bingo_reached = True
-                return True
-    
-        # Check for diagonal wins
-        diagonal_buttons = [self.buttons[i * self.columns + i] for i in range(self.rows)]
-        if all(button.pressed for button in diagonal_buttons):
-            self.bingo_reached = True
-            return True
-    
-        diagonal_buttons = [self.buttons[i * self.columns + self.columns - i - 1] for i in range(self.rows)]
-        if all(button.pressed for button in diagonal_buttons):
-            self.bingo_reached = True
-            return True
-    
-        return False
     
     if __name__ == "__main__":
         if len(sys.argv) != 2:
