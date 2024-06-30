@@ -28,18 +28,20 @@ def wait_for_player_join(queue_server, roundfile, log_path, zeilen, spalten, max
                 print(f"Client joined: {client_queue_name}")
                 clients.append(client_queue_name)
                 player_count += 1
+                send_game_params(client_queue_name, roundfile, log_path, zeilen, spalten, max_players)
             else:
                 print(f"Invalid join message received: {message_str}")
 
         # Notify all clients that the game can start
         start_message = "All players joined. Game can start"
-
+        notify_all_clients(clients, start_message)
         # Loop to receive win messages from clients
         while True:
             message, _ = queue_server.receive()
             message_str = message.decode()
             print(f"Received message from client: {message_str}")
             if message_str.endswith("hat gewonnen!"):
+                handle_win_message(message_str, clients)
                 queue_server.close() #queue nicht schließen sonst kommt nach dem Win dieser Fehler: Message queue '/serverQueue' does not exist.
                 break
 
