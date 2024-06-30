@@ -106,8 +106,119 @@ def run_game(stdscr, player_name, zeilen, spalten, roundfile, log_path, game_sta
 
     app.run(stdscr)
 
+
+def message_listener(app, player_name):
+    client_queue_name = f"/client_{player_name}"
+    queue_client = posix_ipc.MessageQueue(client_queue_name)
+    try:
+        while True:
+            message, _ = queue_client.receive()
+            content = message.decode()
+            if content.endswith("hat gewonnen!"):
+                winner_name = content.split()[0]
+                print(f"{winner_name} hat gewonnen! Exiting the game.")
+                logging.info(f"{winner_name} hat gewonnen!")  # Log the winner
+                app.gewonnen_animation(winner_name)
+                # Log before exiting curses mode
+                logging.shutdown()
+                # Properly close resources and exit
+                curses.endwin()  # Exit curses mode
+                cleanup()  # Clean up all resources
+            else:
+                # Log other messages if needed
+                logging.info(content)
+    except Exception as e:
+        logging.error(f"Error receiving message: {str(e)}")  # Use logging for error messages as well
+        logging.shutdown()
+        cleanup()  # Ensure cleanup is called on exception or termination
+
+
+def run_game_wrapper(stdscr):
+    run_game(stdscr, player_name, zeilen, spalten, roundfile, log_path)
+
+def handle_win_message(win_message):
+    queue_server = posix_ipc.MessageQueue(QUEUE_SERVER)
+    for client_queue_name in clients:
+        try:
+            client_queue = posix_ipc.MessageQueue(client_queue_name)
+            client_queue.send(win_message.encode())
+        except posix_ipc.ExistentialError:
+            print(f"Error: Could not open client queue '{client_queue_name}'")
+    queue_server.close()
+    queue_server.unlink()
+    close_game()
+
 def handle_resize(signum, frame, app):
     app.handle_resize()
+
+def main(player):
+    global player_name, zeilen, spalten, roundfile, log_path
+    player_name = player
+
+    try:
+        client_queue_name = f"/client_{player_name}"
+        clients.append(client_queue_name)
+        queue_server = posix_ipc.MessageQueue(QUEUE_SERVER)
+        queue_client = posix_ipc.MessageQueue(client_queue_name, posix_ipc.O_CREAT)
+
+        join_message = f"JOIN|{client_queue_name}"
+        queue_server.send(join_message.encode())
+        print(f"Sent join message to server: {join_message}")
+
+        while True:
+            message, _ = queue_client.receive()
+            content = message.decode()
+            print(f"Received message: {content}")
+            if content == "All players joined. Game can start":
+                print("Game can start.")
+                time.sleep(3)
+
+                def run_game_wrapper(stdscr):
+                    if curses.LINES < 20 or curses.COLS < 80:
+                        print("Terminal window is too small. Please resize to at least 80x20.")
+                        return
+                    run_game(stdscr, player_name, zeilen, spalten, roundfile, log_path)
+
+                result = curses.wrapper(intro_menu)
+                if result == "start":
+                    curses.wrapper(run_game_wrapper)
+                elif result == "exit":
+                    cleanup()
+                    sys.exit(0)
+                break
+            elif content.endswith("hat gewonnen!"):
+                print(f"{content} - Exiting the game...")
+                curses.endwin()
+                sys.exit(0)
+            else:
+                params_list = content.split('|')
+                if len(params_list) == 5:
+                    roundfile = params_list[0]
+                    log_path = params_list[1]
+                    zeilen = int(params_list[2])
+                    spalten = int(params_list[3])
+                    max_players = int(params_list[4])
+                    print(f"Received parameters from server:")
+                    print(f"Roundfile: {roundfile}")
+                    print(f"Log Path: {log_path}")
+                    print(f"Zeilen: {zeilen}")
+                    print(f"Spalten: {spalten}")
+                else:
+                    print("Received invalid parameters from server.")
+                    sys.exit(1)
+
+    except posix_ipc.ExistentialError as e:
+        print(f"Error: Message queue '{QUEUE_SERVER}' or '{client_queue_name}' does not exist.")
+    except KeyboardInterrupt:
+        print("Exiting...")
+
+    finally:
+        cleanup()
+        
+def close_game():
+    print("Game closed, exiting in 5 seconds...")
+    time.sleep(3)
+    sys.exit(0)
 
 class Button:
     def __init__(self, label, selected=False):
@@ -121,11 +232,6 @@ class Button:
         
     def set_pressed(self, pressed):
         self.pressed = pressed
-
-def close_game():
-    print("Game closed, exiting in 5 seconds...")
-    time.sleep(3)
-    sys.exit(0)
 
 class ButtonGridApp:
     def __init__(self, stdscr, player_name, zeilen, spalten, roundfile):
@@ -398,9 +504,13 @@ class ButtonGridApp:
         curses.endwin()  # Ensure the curses window is properly closed
         sys.exit(0)  # Exit the program with success status
     
-    if __name__ == "__main__":
-        if len(sys.argv) != 2:
-            print(f"Usage: {sys.argv[0]} <player_name>")
-            sys.exit(1)
-        player_name = sys.argv[1]
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} <player_name>")
+        sys.exit(1)
+    player_name = sys.argv[1]
+    try:
+        main(player_name)
+    finally:
+        cleanup()
 
