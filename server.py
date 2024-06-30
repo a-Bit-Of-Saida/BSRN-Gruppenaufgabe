@@ -4,18 +4,6 @@ import sys
 # Name der POSIX Message Queue für die Kommunikation mit Clients
 QUEUE_SERVER = "/serverQueue"
 
-def read_text_file(file_path):
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
-        return text
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        return None
-    except Exception as e:
-        print(f"Error reading file: {e}")
-        return None
-    
 def wait_for_player_join(queue_server, roundfile, log_path, zeilen, spalten, max_players):
     player_count = 0
     clients = []
