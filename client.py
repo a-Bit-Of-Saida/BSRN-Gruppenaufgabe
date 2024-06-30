@@ -3,7 +3,11 @@ import random
 import sys
 import time
 import os
-       
+import logging
+import datetime
+
+
+
 def intro_menu(stdscr):
     curses.curs_set(0)
     stdscr.clear()
@@ -59,8 +63,28 @@ def show_instructions(stdscr):
 
     stdscr.refresh()
     stdscr.getch()
+
+def create_log_file(player_name: str, log_directory: str, zeilen: int, spalten: int):
+    os.makedirs(log_directory, exist_ok=True)
+    now = datetime.datetime.now()
+    date_string = now.strftime("%Y-%m-%d-%H-%M-%S")
+    log_file_name = os.path.join(log_directory, f"log-{date_string}-bingo-{player_name}.txt")
+    logging.basicConfig(filename=log_file_name, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info(f"Log-Datei für {player_name} erstellt.")
+    logging.info(f"Größe des Spielfelds: Zeilen: {zeilen}, Spalten: {spalten}")
+    logging.info(f"Start des Spiels.")
     
-    
+def log_buzzword(button, row, col, app):
+    button_text = button.label
+    if button.pressed:
+        logging.info(f"Button geklickt: {button_text} (Zeile: {row+1}, Spalte: {col+1})")
+    else:
+        logging.info(f"Button rückgängig: {button_text} (Zeile: {row+1}, Spalte: {col+1})")
+
+def spiel_beenden():
+    logging.info("Ende des Spiels")
+    sys.ecit(0)
+
 class Button:
     def __init__(self, label, selected=False):
         self.label = label
@@ -142,7 +166,11 @@ class ButtonGridApp:
         for label in button_labels:
             button = Button(label)
             self.buttons.append(button)
-            
+        
+        if self.rows % 2 == 1 and self.columns % 2 == 1:
+            middle_index = self.rows * self.columns // 2
+            self.buttons[middle_index].pressed = True
+            self.buttons[middle_index].label = "JOKER"
         self.bingo_button = Button("Bingo")
         self.buttons.append(self.bingo_button)
 
