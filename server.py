@@ -87,7 +87,22 @@ def is_valid_int(value):
     except ValueError:
         return False
 
+
 if __name__ == "__main__":
+    usage = """
+    Nutze: server.py <roundfile_path> <log_path> <zeilen> <spalten> <max_players>
+
+    Parameter:
+      <roundfile_path>:   Pfad zu den Buzzwords dieser Runde.
+      <log_path>:         Pfad in der die Log-Datei/Dateien gespeichert werden.
+      <zeilen>:           Anzahl an Zeilen für das Bingofeld.
+      <spalten>:          Anazhl an Spalten für das Bingofeld.
+      <max_players>:      Maximale Anzahl an Spielern dieser Runde.
+
+    Beispiel:
+      python3 server.py Buzzwords-Datei.txt /path/to/logs 10 10 4
+    """
+
     if len(sys.argv) == 6:
         roundfile = sys.argv[1]
         log_path = sys.argv[2]
@@ -113,4 +128,4 @@ if __name__ == "__main__":
 
         main(roundfile, log_path, zeilen, spalten, max_players)
     else:
-        print("Usage: server.py <roundfile_path> <log_path> <zeilen> <spalten> <max_players>")
+        print(usage.strip())
